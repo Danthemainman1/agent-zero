@@ -1,0 +1,343 @@
+<!-- Agent Swarm Visualization Component -->
+<template id="agent-swarm-template">
+    <div class="agent-swarm-container">
+        <div class="swarm-header">
+            <h3>
+                <span class="material-icons">hub</span>
+                Agent Swarm
+            </h3>
+            <div class="swarm-controls">
+                <button class="swarm-btn refresh-btn" onclick="AgentSwarm.refresh()">
+                    <span class="material-icons">refresh</span>
+                </button>
+                <button class="swarm-btn toggle-btn" onclick="AgentSwarm.toggle()">
+                    <span class="material-icons">expand_less</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="swarm-content">
+            <!-- Orchestration Status -->
+            <div class="orchestration-section" id="orchestration-status">
+                <div class="section-title">
+                    <span class="material-icons">account_tree</span>
+                    Orchestration
+                </div>
+                <div class="orchestration-content" id="orchestration-content">
+                    <div class="no-orchestration">No active orchestration</div>
+                </div>
+            </div>
+
+            <!-- Active Agents -->
+            <div class="agents-section">
+                <div class="section-title">
+                    <span class="material-icons">groups</span>
+                    Active Agents
+                </div>
+                <div class="agents-grid" id="agents-grid">
+                    <!-- Agent cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Task Queue -->
+            <div class="tasks-section">
+                <div class="section-title">
+                    <span class="material-icons">list_alt</span>
+                    Task Queue
+                </div>
+                <div class="tasks-list" id="tasks-list">
+                    <!-- Tasks will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style>
+.agent-swarm-container {
+    background: var(--bg-secondary, #1a1a2e);
+    border-radius: 12px;
+    margin: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #2a2a4e);
+}
+
+.swarm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-tertiary, #16213e);
+    border-bottom: 1px solid var(--border-color, #2a2a4e);
+}
+
+.swarm-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #e0e0e0);
+}
+
+.swarm-header h3 .material-icons {
+    font-size: 20px;
+    color: var(--accent-color, #9b59b6);
+}
+
+.swarm-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.swarm-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--text-secondary, #a0a0a0);
+    transition: all 0.2s ease;
+}
+
+.swarm-btn:hover {
+    background: var(--bg-hover, rgba(255,255,255,0.1));
+    color: var(--text-primary, #e0e0e0);
+}
+
+.swarm-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.swarm-content.collapsed {
+    display: none;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #a0a0a0);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.section-title .material-icons {
+    font-size: 16px;
+}
+
+/* Orchestration Section */
+.orchestration-content {
+    background: var(--bg-tertiary, #16213e);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.no-orchestration {
+    color: var(--text-muted, #666);
+    font-size: 13px;
+    text-align: center;
+    padding: 8px;
+}
+
+.orchestration-active {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.orchestration-goal {
+    font-size: 14px;
+    color: var(--text-primary, #e0e0e0);
+    font-weight: 500;
+}
+
+.orchestration-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: var(--bg-primary, #0f0f23);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color, #9b59b6), var(--accent-secondary, #3498db));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0a0);
+    text-align: right;
+}
+
+.orchestration-phases {
+    display: flex;
+    gap: 8px;
+}
+
+.phase-indicator {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-primary, #0f0f23);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0a0);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.phase-indicator.active {
+    border-color: var(--accent-color, #9b59b6);
+    color: var(--accent-color, #9b59b6);
+}
+
+.phase-indicator.completed {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27ae60;
+}
+
+/* Agents Grid */
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.agent-card {
+    background: var(--bg-tertiary, #16213e);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.agent-card:hover {
+    border-color: var(--border-hover, #3a3a5e);
+}
+
+.agent-card.active {
+    border-color: var(--accent-color, #9b59b6);
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.2);
+}
+
+.agent-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.agent-avatar.planner { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.agent-avatar.executor { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.agent-avatar.knowledge { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+.agent-avatar.verifier { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+.agent-avatar.default { background: rgba(149, 165, 166, 0.2); color: #95a5a6; }
+
+.agent-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary, #e0e0e0);
+}
+
+.agent-role {
+    font-size: 10px;
+    color: var(--text-secondary, #a0a0a0);
+    text-transform: capitalize;
+}
+
+.agent-status {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.agent-status.idle {
+    background: rgba(149, 165, 166, 0.2);
+    color: #95a5a6;
+}
+
+.agent-status.working {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+/* Tasks List */
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bg-tertiary, #16213e);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.task-status-icon {
+    font-size: 14px;
+}
+
+.task-status-icon.pending { color: #f1c40f; }
+.task-status-icon.running { color: #3498db; }
+.task-status-icon.completed { color: #2ecc71; }
+.task-status-icon.failed { color: #e74c3c; }
+
+.task-name {
+    flex: 1;
+    color: var(--text-primary, #e0e0e0);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-progress {
+    font-size: 11px;
+    color: var(--text-secondary, #a0a0a0);
+}
+
+.no-tasks {
+    color: var(--text-muted, #666);
+    font-size: 13px;
+    text-align: center;
+    padding: 12px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .agents-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>

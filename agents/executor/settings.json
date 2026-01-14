@@ -1,0 +1,4 @@
+{
+    "description": "Executor Agent - Focused task execution specialist",
+    "notes": "This agent profile is optimized for efficient single-task execution. Use with call_subordinate tool with profile='executor'."
+}

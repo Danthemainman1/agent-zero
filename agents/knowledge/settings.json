@@ -1,0 +1,4 @@
+{
+    "description": "Knowledge Agent - Information retrieval and research specialist",
+    "notes": "This agent profile is optimized for research and information synthesis. Use with call_subordinate tool with profile='knowledge'."
+}

@@ -1,0 +1,4 @@
+{
+    "description": "Planner Agent - Task decomposition and execution planning specialist",
+    "notes": "This agent profile is optimized for strategic planning and task breakdown. Use with call_subordinate tool with profile='planner'."
+}

@@ -1,0 +1,4 @@
+{
+    "description": "Verifier Agent - Quality assurance and validation specialist",
+    "notes": "This agent profile is optimized for reviewing and validating completed work. Use with call_subordinate tool with profile='verifier'."
+}
